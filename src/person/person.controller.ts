@@ -2,7 +2,7 @@
  * @Author: Jeffrey
  * @Date: 2023-07-30 12:32:25
  * @LastEditors: Jeffrey
- * @LastEditTime: 2023-09-16 11:00:31
+ * @LastEditTime: 2023-09-16 11:40:59
  * @Description: Do not edit
  */
 import {
@@ -15,10 +15,15 @@ import {
   Delete,
   Query,
   Ip,
+  HttpException,
+  HttpStatus,
+  UseFilters,
+  ForbiddenException,
 } from '@nestjs/common';
 import { PersonService } from './person.service';
 import { CreatePersonDto } from './dto/create-person.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
+import { HttpExceptionFilter } from 'src/filter/HttpExceptionFilter';
 
 @Controller('person')
 export class PersonController {
@@ -33,7 +38,20 @@ export class PersonController {
   // findAll 和 findOneByQuery有优先级的概念，上面优先匹配。
   @Get()
   findAll() {
-    return this.personService.findAll();
+    throw new HttpException(
+      {
+        status: HttpStatus.FORBIDDEN,
+        error: 'This is a custom message',
+      },
+      HttpStatus.FORBIDDEN,
+    );
+    // return this.personService.findAll();
+  }
+
+  @Get('/error')
+  @UseFilters(HttpExceptionFilter)
+  createError() {
+    throw new ForbiddenException();
   }
 
   // /person?name=xx
